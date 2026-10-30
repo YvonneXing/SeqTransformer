@@ -24,8 +24,8 @@ def main():
     # ======1. 设置随机种子、device 和配置======
     data_dir = "./assignment1_data"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    epochs = 1000
-    patience = 500  # 设置早停，连续n轮valid Q3没有提高就提前停止
+    epochs = 10
+    patience = 10  # 设置早停，连续n轮valid Q3没有提高就提前停止
     batch_size = 32
     lr = 1e-3
     momentum = 0.9
@@ -292,7 +292,8 @@ def main():
     # ======8. 在模型选择完成后，使用测试集=======
     test_tf_loss, test_ar_loss, test_q3, test_f1 = valid_one_epoch(
         model, test_loader, loss_fn, device,
-        bos_id, dec_pad_id, ignore_index
+        bos_id, dec_pad_id, ignore_index,
+        num_examples=8
     )
 
     test_metrics = {
