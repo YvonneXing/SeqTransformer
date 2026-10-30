@@ -11,10 +11,20 @@ def sequence_mask(X, valid_lens, value):
     # X(B,Q,K) -> X(B*Q,K)
     shape = X.shape
     X = X.reshape(-1, X.shape[-1])
+    # 要求masked_softmax已经把valid_lens整理为每一个query对应一个长度
+    # valid_len.ndim == 1
     # 必须满足valid_lens.shape[0] == X.shape[0]
     assert valid_lens.shape[0] == X.shape[0]
-    for i, valid_len in enumerate(valid_lens):
-        X[i, valid_len:] = value
+
+    # 改掉逐元素填充一个非常大的负值，采用整体bool mask
+    # 生成列索引positions(K,)
+    positions = torch.arange(X.shape[-1], dtype=torch.long, device=X.device)
+    # positions(K, ) -> (1, K)
+    # valid_lens(B*Q,) -> (B*Q, 1)
+    # mask(B*Q, K)，需要填value的地方为True
+    mask = positions[None,:] >= valid_lens[:, None]
+    X = X.masked_fill(mask, value)
+
     return X.reshape(shape)
 
 
