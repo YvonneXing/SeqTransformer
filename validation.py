@@ -86,10 +86,12 @@ def valid_one_epoch(model, loader,loss_fn, device,
     autoregressive_total_loss = 0.0
     total_tokens = 0
 
+    # ===============为了展示prediction额外添加===============
     # 用于显示存放target和对应的prediction结果，未展平
     predictions_visual = []
     targets_visual = []
     idx_to_label = {0: "H", 1: "E", 2: "C"}
+    # ===============为了展示prediction额外添加===============
 
     # 计算f1 score的已经展平的结果
     all_predictions = []
@@ -136,6 +138,7 @@ def valid_one_epoch(model, loader,loss_fn, device,
         # 虽然CrossEntrpyLoss可以自动忽略pad，但是accuracy和f1不行
         valid_mask = target_ssps != ignore_index
 
+        # ===============为了展示prediction额外添加===============
         # 在test时展示target对应的prediction
         # 先按序列保存用于展示的结果
         # 此时 predicted_ssps 和 target_ssps 都还是 (B, L) 的张量
@@ -168,6 +171,7 @@ def valid_one_epoch(model, loader,loss_fn, device,
         flat_predictions = predicted_ssps[valid_mask].cpu().tolist()
         # 收集 target_ssps[valid_mask] (B, padded_len) -> (B * 每行valid_len)
         flat_targets = target_ssps[valid_mask].cpu().tolist()  # 从tensor变成普通的python数据
+        # ===============为了展示prediction额外添加===============
 
         all_predictions.extend(flat_predictions)  # extend逐元素添加
         all_targets.extend(flat_targets)
@@ -185,6 +189,7 @@ def valid_one_epoch(model, loader,loss_fn, device,
     # 只针对autoregressive的f1 score
     f1 = f1_score(all_targets, all_predictions, labels=[0,1,2], average='macro',zero_division=0)
 
+    # ===============为了展示prediction额外添加===============
     # print target对应的precition
     # 将展示内容逐行收集起来，方便同时打印和保存
     output_lines = []
@@ -226,5 +231,6 @@ def valid_one_epoch(model, loader,loss_fn, device,
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(output_text, encoding="utf-8")
             print(f"测试示例已保存到：{path}")
+    # ===============为了展示prediction额外添加===============
 
     return Teacher_forced_avg_loss, autoregressive_avg_loss, accuracy, f1

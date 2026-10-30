@@ -235,7 +235,7 @@ def main():
             )
 
             # 按验证集的自回归 Q3 选择最佳模型
-            if val_q3 > best_q3:
+            if val_q3 >= best_q3:
                 best_q3 = val_q3
                 best_epoch = epoch
 
