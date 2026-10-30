@@ -24,8 +24,8 @@ def main():
     # ======1. 设置随机种子、device 和配置======
     data_dir = "./assignment1_data"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    epochs = 10
-    patience = 3  # 设置早停，连续n轮valid Q3没有提高就提前停止
+    epochs = 1000
+    patience = 500  # 设置早停，连续n轮valid Q3没有提高就提前停止
     batch_size = 32
     lr = 1e-3
     momentum = 0.9
