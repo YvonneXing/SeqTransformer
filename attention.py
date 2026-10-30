@@ -14,8 +14,7 @@ def sequence_mask(X, valid_lens, value):
     # 必须满足valid_lens.shape[0] == X.shape[0]
     assert valid_lens.shape[0] == X.shape[0]
     for i, valid_len in enumerate(valid_lens):
-        for j in range(valid_len, X.shape[-1]):
-            X[i, j] = value
+        X[i, valid_len:] = value
     return X.reshape(shape)
 
 
