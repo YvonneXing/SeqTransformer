@@ -23,6 +23,7 @@ def sequence_mask(X, valid_lens, value):
     # valid_lens(B*Q,) -> (B*Q, 1)
     # mask(B*Q, K)，需要填value的地方为True
     mask = positions[None,:] >= valid_lens[:, None]
+    # 一次性处理整个tensor，每个位置不是互相依赖的
     X = X.masked_fill(mask, value)
 
     return X.reshape(shape)
