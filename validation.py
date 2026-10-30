@@ -162,9 +162,10 @@ def valid_one_epoch(model, loader,loss_fn, device,
                 targets_visual.append(target_text)
                 predictions_visual.append(prediction_text)
 
-        # 收集 predicted_ssps[valid_mask] (B, padded_len) -> (B, valid_lens)
+        # 布尔索引触发展平
+        # 收集 predicted_ssps[valid_mask] (B, padded_len) -> (B * 每行valid_len)
         flat_predictions = predicted_ssps[valid_mask].cpu().tolist()
-        # 收集 target_ssps[valid_mask] (B, padded_len) -> (B, valid_lens)
+        # 收集 target_ssps[valid_mask] (B, padded_len) -> (B * 每行valid_len)
         flat_targets = target_ssps[valid_mask].cpu().tolist()  # 从tensor变成普通的python数据
 
         all_predictions.extend(flat_predictions)  # extend逐元素添加
