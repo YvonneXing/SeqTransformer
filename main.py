@@ -18,7 +18,7 @@ from custom_dataset import (
 from transformer import Transformer
 from training import train_one_epoch
 from validation import valid_one_epoch
-
+from save_parameters_txt import save_parameters_txt
 
 def main():
     # ======1. 设置随机种子、device 和配置======
@@ -288,6 +288,20 @@ def main():
         f"val Q3={best_q3:.2%}"
     )
 
+    # 可视化保存模型的可学习参数(默认带梯度的是可学习参数)
+    # 筛选可训练参数的名称，读取最佳模型对应的参数值
+    best_trainable_parameters = {}
+
+    # param是tensor对象
+    for name, param in model.named_parameters():
+        if param.requires_grad:
+            best_trainable_parameters[name] = param
+
+    # 使用前面定义的保存函数，输出名称、size 和完整 tensor
+    save_parameters_txt(
+        best_trainable_parameters,
+        run_dir / "best_trainable_parameters.txt",
+    )
 
     # ======8. 在模型选择完成后，使用测试集=======
     test_tf_loss, test_ar_loss, test_q3, test_f1 = valid_one_epoch(
