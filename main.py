@@ -293,7 +293,8 @@ def main():
     test_tf_loss, test_ar_loss, test_q3, test_f1 = valid_one_epoch(
         model, test_loader, loss_fn, device,
         bos_id, dec_pad_id, ignore_index,
-        num_examples=8
+        num_examples=8,
+        examples_path=run_dir / "test_examples.txt",
     )
 
     test_metrics = {

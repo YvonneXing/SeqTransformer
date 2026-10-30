@@ -1,6 +1,7 @@
 import torch
 from custom_dataset import build_decoder_inputs
 from sklearn.metrics import accuracy_score, f1_score
+from pathlib import Path
 
 # ===========
 # evaluation prediction function
@@ -78,7 +79,7 @@ def predict_autoregressive(model, input_seqs, enc_valid_lens,
 @torch.no_grad()
 def valid_one_epoch(model, loader,loss_fn, device,
                     bos_id, dec_pad_id, ignore_index,
-                    num_examples=0):
+                    num_examples=0, examples_path=None):
     model.eval()
 
     Teacher_forced_total_loss = 0.0
@@ -185,12 +186,16 @@ def valid_one_epoch(model, loader,loss_fn, device,
     f1 = f1_score(all_targets, all_predictions, labels=[0,1,2], average='macro',zero_division=0)
 
     # print target对应的precition
+    # 将展示内容逐行收集起来，方便同时打印和保存
+    output_lines = []
+
     for sample_id, (target_text, prediction_text) in enumerate(
             zip(targets_visual, predictions_visual), start=1):
 
-        print(f"\nSample {sample_id} | length={len(target_text)}")
+        output_lines.append(
+            f"Sample {sample_id} | length={len(target_text)}"
+        )
 
-        # 每行显示 80 个残基，避免长序列难以对齐
         width = 80
         for start in range(0, len(target_text), width):
             end = min(start + width, len(target_text))
@@ -203,9 +208,23 @@ def valid_one_epoch(model, loader,loss_fn, device,
                 for target, prediction in zip(target_part, prediction_part)
             )
 
-            print(f"Position   : {start + 1}-{end}")
-            print(f"Target     : {target_part}")
-            print(f"Prediction : {prediction_part}")
-            print(f"Match      : {matches}")
+            output_lines.append(f"Position   : {start + 1}-{end}")
+            output_lines.append(f"Target     : {target_part}")
+            output_lines.append(f"Prediction : {prediction_part}")
+            output_lines.append(f"Match      : {matches}")
+            output_lines.append("")  # 空行分隔
+
+    if output_lines:
+        output_text = "\n".join(output_lines) + "\n"
+
+        # 在终端显示
+        print(output_text)
+
+        # 如果指定路径，同时保存到文件
+        if examples_path is not None:
+            path = Path(examples_path)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(output_text, encoding="utf-8")
+            print(f"测试示例已保存到：{path}")
 
     return Teacher_forced_avg_loss, autoregressive_avg_loss, accuracy, f1
