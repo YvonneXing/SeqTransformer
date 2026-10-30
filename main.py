@@ -62,7 +62,7 @@ def main():
     # ======2. 创建本次实验目录======
     # 目录内保存 CSV、最佳 checkpoint、模型配置
     run_name = datetime.now().strftime("%Y%m%d-%H%M%S_%f")
-    run_dir = Path("runs") / run_name
+    run_dir = Path("Transformer_runs") / run_name
     run_dir.mkdir(parents=True, exist_ok=True)
 
     csv_path = run_dir / "metrics.csv"
